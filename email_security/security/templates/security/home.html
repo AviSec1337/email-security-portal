@@ -1,0 +1,30 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Email Security Portal</title>
+</head>
+<body>
+    <h2>Welcome to the Email Security Portal</h2>
+    <a href="{% url 'login' %}">Login</a>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Email Security Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex justify-center items-center h-screen">
+
+    <div class="bg-white shadow-lg rounded-lg p-8 text-center w-96">
+        <h2 class="text-2xl font-bold text-gray-800">Welcome to the Email Security Portal</h2>
+        <p class="text-gray-600 mt-2">Secure your Emails with Advanced Protection.</p>
+        
+        <a href="{% url 'login' %}" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300">
+            Login
+        </a>
+    </div>
+
+</body>
+</html>

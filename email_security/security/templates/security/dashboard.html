@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <nav class="bg-blue-600 p-4 text-white">
+        <div class="container mx-auto flex justify-between">
+            <h2 class="text-2xl font-bold">Email Security Dashboard</h2>
+            <a href="/logout/" class="bg-red-500 px-4 py-2 rounded">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-4">Welcome, {{ request.user.username }}</h2>
+        
+        <h3 class="text-lg font-semibold mb-2">Security Status</h3>
+        <ul class="list-disc pl-5">
+            <li>Spam Protection: ✅ Enabled</li>
+            <li>Phishing Detection: ✅ Active</li>
+            <li>Threat Intelligence: ✅ Integrated</li>
+        </ul>
+
+        <h3 class="text-lg font-semibold mt-4">Recent Activities</h3>
+        <div class="bg-gray-200 p-4 rounded-md mt-2">
+            <p>No recent threats detected. System running smoothly.</p>
+        </div>
+
+        <h3 class="text-lg font-semibold mt-4">Check Email Security</h3>
+        
+
+        <h3 class="text-lg font-semibold mt-4">Threat Intelligence</h3>
+        <form id="ipCheckForm" class="mt-4">
+            {% csrf_token %}
+            <input type="text" name="ip" placeholder="Enter IP Address" class="w-full p-2 border rounded">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Check IP</button>
+        </form>
+        <div id="ipResult" class="mt-4 p-4 bg-gray-200 rounded-md hidden"></div>
+        <form id="hashCheckForm" class="mt-4">
+            {% csrf_token %}
+            <input type="text" name="hash" placeholder="Enter Hash" class="w-full p-2 border rounded">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Check Hash</button>
+        </form>
+        <div id="hashResult" class="mt-4 p-4 bg-gray-200 rounded-md hidden"></div>
+        <form id="domainCheckForm" class="mt-4">
+            {% csrf_token %}
+            <input type="text" name="domain" placeholder="Enter Domain" class="w-full p-2 border rounded">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Check Domain</button>
+        </form>
+        <div id="domainResult" class="mt-4 p-4 bg-gray-200 rounded-md hidden"></div>
+    
+
+        <!-- <form id="spamForm" class="mt-2">
+            <textarea name="email_content" placeholder="Enter email content" class="w-full p-2 border rounded"></textarea>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Check Spam</button>
+        </form>
+
+        <form id="phishingForm" class="mt-4">
+            <input type="text" name="email_url" placeholder="Enter email URL" class="w-full p-2 border rounded">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Check Phishing</button>
+        </form>
+
+        <form id="authForm" class="mt-4">
+            <input type="text" name="domain" placeholder="Enter Domain" class="w-full p-2 border rounded">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Check Authentication</button>
+        </form>
+
+        <form id="encryptForm" class="mt-4">
+            <textarea name="email_content" placeholder="Enter email to encrypt" class="w-full p-2 border rounded"></textarea>
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded mt-2">Encrypt</button>
+        </form> -->
+
+        <script>
+            function getCSRFToken() {
+                return document.querySelector('[name=csrfmiddlewaretoken]').value;
+            }
+        
+            function fetchThreatIntelligence(endpoint, formId, resultId) {
+                document.getElementById(formId).onsubmit = function(event) {
+                    event.preventDefault();
+        
+                    let formData = new FormData(event.target);
+                    let csrfToken = getCSRFToken();
+        
+                    fetch(endpoint, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP Error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        let resultDiv = document.getElementById(resultId);
+                        
+                        if (!resultDiv) {
+                            console.error(`Error: Element with ID '${resultId}' not found.`);
+                            alert(`Error: Cannot find result container for ${resultId}`);
+                            return;
+                        }
+        
+                        if (data.error) {
+                            resultDiv.innerHTML = `<h4 class="font-bold text-red-600">Error:</h4><p>${data.error}</p>`;
+                        } else {
+                            resultDiv.innerHTML = `
+                                <h4 class="font-bold text-blue-600">Threat Intelligence Report:</h4>
+                                <p><strong>Reputation:</strong> ${data.reputation}</p>
+                                <p><strong>Malicious:</strong> ${data.malicious}</p>
+                                <p><strong>Suspicious:</strong> ${data.suspicious}</p>
+                                <p><strong>Harmless:</strong> ${data.harmless}</p>
+                                <p><strong>Country:</strong> ${data.country}</p>
+                                <p><strong>Network:</strong> ${data.network}</p>
+                            `;
+                        }
+                        resultDiv.classList.remove("hidden");
+                    })
+                    .catch(error => {
+                        console.error("Fetch error:", error);
+                        alert(`Failed to fetch threat intelligence data: ${error.message}`);
+                    });
+                };
+            }
+        
+            fetchThreatIntelligence("/check-ip/", "ipCheckForm", "ipResult");
+            fetchThreatIntelligence("/check-hash/", "hashCheckForm", "hashResult");
+            fetchThreatIntelligence("/check-domain/", "domainCheckForm", "domainResult");
+        </script>
+        
+    
+    
+    
+
+</body>
+</html>
